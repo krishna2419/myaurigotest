@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Transfer Loan{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">REASSIGN ACTIVE LOAN</p>
+      <h1>Transfer equipment</h1>
+      <p>Move responsibility for this active loan to another borrower without changing the physical unit or its due date.</p>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-list">
+        {% for category, message in messages %}
+          <div class="flash-message {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="split-grid">
+    <section class="card">
+      <div class="section-header"><h2>Current loan</h2><span class="status-badge {% if loan.status == 'overdue' %}status-overdue{% else %}status-borrowed{% endif %}">{{ loan.status|replace('_', ' ')|title }}</span></div>
+      <div class="detail-grid">
+        <div class="detail-row"><span>Current borrower</span><strong>{{ loan.borrower_name }}</strong></div>
+        <div class="detail-row"><span>Equipment</span><strong>{{ loan.equipment_name }}</strong></div>
+        <div class="detail-row"><span>Asset tag</span><strong class="asset-tag">{{ loan.asset_tag }}</strong></div>
+        <div class="detail-row"><span>Borrowed date</span><strong>{{ loan.borrowed_at }}</strong></div>
+        <div class="detail-row"><span>Original due date</span><strong>{{ loan.due_at }}</strong></div>
+      </div>
+    </section>
+
+    <section class="card callout">
+      <h2>What stays the same</h2>
+      <p>The same loan and physical stock unit remain active.</p>
+      <ul class="compact-list">
+        <li>Due date remains <strong>{{ loan.due_at }}</strong></li>
+        <li>Equipment availability does not change</li>
+        <li>No new loan record is created</li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="transfer-arrow" aria-label="Transfer from current borrower to new borrower"><span>{{ loan.borrower_name }}</span><b>→</b><span>New borrower</span></div>
+
+  <form method="post" class="form-shell section">
+    <div class="card form-card">
+      <div class="field">
+        <label for="to_borrower_id">Transfer to borrower</label>
+        <select id="to_borrower_id" name="to_borrower_id" required>
+          <option value="">Select a different borrower</option>
+          {% for borrower in borrowers %}
+            <option value="{{ borrower.id }}">{{ borrower.name }} · {{ borrower.active_loan_count }} / {{ max_active_loans }} active loans</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="button-primary" type="submit">Confirm transfer</button>
+        <a class="button button-secondary" href="{{ url_for('dashboard.loans') }}">Cancel</a>
+      </div>
+    </div>
+  </form>
+{% endblock %}

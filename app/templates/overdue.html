@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Overdue Loans{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">ACTION REQUIRED</p><h1>Overdue loans</h1><p>Active loans past their due date. Estimated fees are informational until return.</p></div>
+    <div class="page-actions"><a class="button button-secondary" href="{{ url_for('dashboard.loans') }}">View active loans</a></div>
+  </div>
+
+  {% if overdue_loans %}
+    <div class="table-toolbar"><div><strong>{{ overdue_loans|length }} item{% if overdue_loans|length != 1 %}s{% endif %} need attention</strong><span class="muted">Estimated fees update until return.</span></div><input class="table-filter" data-filter-input="#overdue-loans-table" placeholder="Search overdue loans" aria-label="Search overdue loans"></div>
+    <div class="table-wrap"><table>
+      <thead>
+        <tr>
+          <th>Borrower</th>
+          <th>Equipment type</th>
+          <th>Asset tag</th>
+          <th>Borrowed date</th>
+          <th>Due date</th>
+          <th>Days overdue</th>
+          <th>Daily late fee</th>
+          <th>Estimated late fee</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="overdue-loans-table">
+        {% for loan in overdue_loans %}
+          <tr data-filter-row>
+            <td class="primary-text">{{ loan.borrower }}</td>
+            <td>{{ loan.equipment }}</td>
+            <td class="asset-tag">{{ loan.asset_tag }}</td>
+            <td>{{ loan.borrowed_at }}</td>
+            <td>{{ loan.due_at }}</td>
+            <td>{{ loan.days_overdue }}</td>
+            <td>£{{ '%.2f'|format(loan.daily_late_fee) }}</td>
+            <td>£{{ '%.2f'|format(loan.estimated_late_fee) }}</td>
+            <td><a class="button button-primary" href="{{ url_for('dashboard.loans') }}">Open active loans</a></td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+  {% else %}
+    <div class="empty"><strong>No overdue loans</strong>All active equipment is within its due date.</div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Transfer Recorded{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">TRANSFER COMPLETE</p>
+      <h1>Transfer recorded</h1>
+      <p>Responsibility has moved to the new borrower. The same active loan and physical unit remain in place.</p>
+    </div>
+  </div>
+
+  <div class="card success-panel">
+    <div class="success-mark">✓</div>
+    <div class="detail-grid">
+      <div class="detail-row"><span>Equipment</span><strong>{{ loan.equipment_name }}</strong></div>
+      <div class="detail-row"><span>Asset tag</span><strong class="asset-tag">{{ loan.asset_tag }}</strong></div>
+      <div class="detail-row"><span>Previous borrower</span><strong>{{ loan.borrower_name }}</strong></div>
+      <div class="detail-row"><span>New borrower</span><strong>{{ new_borrower_name }}</strong></div>
+      <div class="detail-row"><span>Original due date</span><strong>{{ loan.due_at }}</strong></div>
+      <div class="detail-row"><span>Status</span><strong class="status-badge status-borrowed">Active</strong></div>
+    </div>
+  </div>
+
+  <div class="page-actions section">
+    <a class="button button-primary" href="{{ url_for('dashboard.loans') }}">View active loans</a>
+    <a class="button button-secondary" href="{{ url_for('dashboard.equipment') }}">View equipment</a>
+  </div>
+{% endblock %}

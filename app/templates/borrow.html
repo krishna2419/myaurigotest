@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Borrow Equipment{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">NEW LOAN</p><h1>Borrow equipment</h1><p>Issue physical equipment while checking real stock availability and borrowing capacity.</p></div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-list">
+        {% for category, message in messages %}
+          <div class="flash-message {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <form method="post" action="{{ url_for('borrow.borrow') }}" class="form-shell section">
+    <div class="card form-card">
+      <div class="form-grid">
+        <div class="field">
+          <label for="borrower_id">Borrower</label>
+          <select id="borrower_id" name="borrower_id" required>
+            <option value="">Select borrower</option>
+            {% for borrower in borrowers %}
+              <option value="{{ borrower.id }}" {% if selection and selection.borrower_id == borrower.id %}selected{% endif %}>{{ borrower.name }} ({{ borrower.active_loan_count }} / {{ max_active_loans }})</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="item_type_id">Equipment type</label>
+          <select id="item_type_id" name="item_type_id" required>
+            <option value="">Select equipment</option>
+            {% for item in item_types %}
+              <option value="{{ item.id }}" {% if selection and selection.item_type_id == item.id %}selected{% endif %}>
+                {{ item.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="quantity">Quantity</label>
+          <input id="quantity" name="quantity" type="number" min="1" step="1" value="{{ selection.quantity if selection and selection.quantity else 1 }}">
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-header"><h2>Borrowing capacity</h2><span class="muted">Maximum {{ max_active_loans }} active loans</span></div>
+      <div class="card capacity-list">
+        {% for borrower in borrowers %}
+          <p class="detail-row">
+            <strong>{{ borrower.name }}</strong>
+            <span>Currently borrowed: {{ borrower.active_loan_count }} / {{ max_active_loans }} · Remaining: {{ [max_active_loans - borrower.active_loan_count, 0]|max }}</span>
+          </p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if item_details %}
+      <div class="section">
+        <h2>Selected equipment details</h2>
+        <div class="card detail-grid">
+          <div class="detail-row"><span>Equipment</span><strong>{{ item_details.name }}</strong></div>
+          <div class="detail-row"><span>Category</span><strong>{{ item_details.category }}</strong></div>
+          <div class="detail-row"><span>Total units</span><strong>{{ item_details.total_units }}</strong></div>
+          <div class="detail-row"><span>Currently available</span><strong>{{ item_details.available_units }}</strong></div>
+          <div class="detail-row"><span>Default loan duration</span><strong>{{ item_details.default_loan_days }} days</strong></div>
+          <div class="detail-row"><span>Deposit per unit</span><strong>£{{ '%.2f'|format(item_details.deposit_amount) }}</strong></div>
+          <div class="detail-row"><span>Daily late fee</span><strong>£{{ '%.2f'|format(item_details.daily_late_fee) }}</strong></div>
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="form-actions">
+      <button class="button-primary" type="submit">Confirm borrowing</button>
+      <a class="button button-secondary" href="{{ url_for('dashboard.index') }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

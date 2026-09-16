@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Borrowing Confirmed{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">LOAN CREATED</p><h1>Borrowing confirmed</h1>
+    <p>The equipment was successfully assigned to the selected borrower.</p>
+    </div>
+  </div>
+
+  <div class="card success-panel">
+    <div class="success-mark">✓</div>
+    <div class="detail-grid">
+      <div class="detail-row"><span>Borrower</span><strong>{{ borrower_name }}</strong></div>
+      <div class="detail-row"><span>Equipment</span><strong>{{ item_name }}</strong></div>
+      <div class="detail-row"><span>Units borrowed</span><strong>{{ quantity }}</strong></div>
+      <div class="detail-row"><span>Asset tags</span><strong class="asset-tag">{{ asset_tags | join(', ') }}</strong></div>
+      <div class="detail-row"><span>Borrowed date</span><strong>{{ borrowed_at }}</strong></div>
+      <div class="detail-row"><span>Due date</span><strong>{{ due_at }}</strong></div>
+      <div class="detail-row"><span>Total deposit collected</span><strong>£{{ '%.2f'|format(total_deposit) }}</strong></div>
+    </div>
+  </div>
+
+  <div class="page-actions section">
+    <a class="button button-primary" href="/loans">View active loans</a>
+    <a class="button button-secondary" href="/borrow">Borrow another item</a>
+  </div>
+{% endblock %}

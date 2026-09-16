@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}AV Gear Hub{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <button class="mobile-menu-button" type="button" data-menu-toggle aria-label="Open navigation">Menu</button>
+    <div class="app-shell">
+      <aside class="sidebar" data-sidebar>
+        <a class="brand" href="/">
+          <span class="brand-mark">AV</span>
+          <span class="brand-copy"><strong>AV Gear Hub</strong><small>Equipment lending</small></span>
+        </a>
+        <div class="sidebar-label">Workspace</div>
+        <nav class="sidebar-nav" aria-label="Main navigation">
+          <a href="/" class="{% if current_page == 'dashboard' %}active{% endif %}"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+          <a href="/equipment" class="{% if current_page == 'equipment' %}active{% endif %}"><span class="nav-icon">▤</span><span>Equipment</span></a>
+          <a href="/loans" class="{% if current_page == 'loans' %}active{% endif %}"><span class="nav-icon">↔</span><span>Active loans</span></a>
+          <a href="/overdue" class="{% if current_page == 'overdue' %}active{% endif %}"><span class="nav-icon">!</span><span>Overdue</span></a>
+        </nav>
+        <div class="sidebar-spacer"></div>
+        <div class="sidebar-note"><span class="live-dot"></span><span><strong>Desk online</strong><small>Inventory is up to date</small></span></div>
+        <a class="sidebar-footer-link" href="/borrow">+ Start a new loan</a>
+      </aside>
+      <div class="app-main">
+        <header class="topbar">
+          <div class="topbar-context">AV ROOM <span>/</span> LENDING OPERATIONS</div>
+          <a class="button button-primary topbar-action" href="/borrow">+ Borrow equipment</a>
+        </header>
+        <main class="content-container">
+          {% block content %}{% endblock %}
+        </main>
+        <footer class="site-footer">AV Gear Hub <span>•</span> Equipment lending management</footer>
+      </div>
+    </div>
+    <div class="sidebar-backdrop" data-menu-close></div>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Equipment Inventory{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">INVENTORY CONTROL</p><h1>Equipment inventory</h1><p>Physical stock units and usage status across the lending desk.</p></div>
+    <div class="page-actions"><a class="button button-primary" href="{{ url_for('borrow.borrow') }}">+ Borrow equipment</a></div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><div><p class="eyebrow">CATALOGUE</p><h2>Equipment types</h2></div><span class="muted">Availability by category</span></div>
+    {% if inventory_summary %}
+      <div class="equipment-grid">
+        {% for item in inventory_summary %}
+          {% set available = item.available_units or 0 %}
+          {% set total = item.total_units or 0 %}
+          <article class="equipment-card">
+            <div class="equipment-card-top"><span class="equipment-glyph">{{ item.category[:3]|upper }}</span><span class="status-badge {% if available == 0 %}status-overdue{% elif available < total / 2 %}status-damaged{% else %}status-available{% endif %}">{% if available == 0 %}Unavailable{% elif available < total / 2 %}Limited{% else %}Available{% endif %}</span></div>
+            <h3>{{ item.name }}</h3>
+            <p class="muted">{{ item.category|title }} equipment</p>
+            <div class="availability-meter"><span style="width: {{ (available / total * 100) if total else 0 }}%;"></span></div>
+            <div class="equipment-count"><strong>{{ available }} <small>available</small></strong><span>{{ total }} total</span></div>
+            <div class="equipment-meta"><span>Borrowed <strong>{{ item.borrowed_units or 0 }}</strong></span><span>Unavailable <strong>{{ item.damaged_lost_maintenance or 0 }}</strong></span></div>
+          </article>
+        {% endfor %}
+      </div>
+      <div class="table-wrap legacy-inventory-table"><table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Total</th>
+            <th>Available</th>
+            <th>Borrowed</th>
+            <th>Damaged/Lost/Maintenance</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in inventory_summary %}
+            <tr>
+              <td>{{ item.name }}</td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.total_units }}</td>
+              <td>{{ item.available_units or 0 }}</td>
+              <td>{{ item.borrowed_units or 0 }}</td>
+              <td>{{ item.damaged_lost_maintenance or 0 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% else %}
+      <div class="empty"><strong>No equipment types yet</strong>Add equipment types to begin tracking inventory.</div>
+    {% endif %}
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>All stock units</h2><span class="muted">Every physical asset</span></div>
+    {% if inventory_units %}
+      <div class="table-wrap"><table>
+        <thead>
+          <tr>
+            <th>Equipment type</th>
+            <th>Category</th>
+            <th>Asset tag</th>
+            <th>Status</th>
+            <th>Condition</th>
+            <th>Current borrower</th>
+            <th>Due date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for unit in inventory_units %}
+            <tr>
+              <td class="primary-text">{{ unit.equipment }}</td>
+              <td>{{ unit.category }}</td>
+              <td class="asset-tag">{{ unit.asset_tag }}</td>
+              <td>
+                <span class="status-badge status-{{ unit.status.replace(' ', '-') if unit.status in ['available','borrowed','overdue','damaged','lost','maintenance'] else 'borrowed' }}">
+                  {{ unit.status_label }}
+                </span>
+              </td>
+              <td>{{ unit.condition_note or '—' }}</td>
+              <td>{{ unit.borrower or '—' }}</td>
+              <td>{{ unit.due_at or '—' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% else %}
+      <div class="empty"><strong>No physical units found</strong>There are no stock units to display.</div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Return Recorded{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">LOAN CLOSED</p><h1>Return recorded</h1>
+    <p>The equipment has been returned and inventory has been updated.</p>
+    </div>
+  </div>
+
+  <div class="card success-panel">
+    <div class="success-mark">✓</div>
+    <div class="detail-grid">
+      <div class="detail-row"><span>Borrower</span><strong>{{ borrower_name }}</strong></div>
+      <div class="detail-row"><span>Equipment</span><strong>{{ equipment_name }}</strong></div>
+      <div class="detail-row"><span>Asset tag</span><strong class="asset-tag">{{ asset_tag }}</strong></div>
+      <div class="detail-row"><span>Borrowed on</span><strong>{{ borrowed_at }}</strong></div>
+      <div class="detail-row"><span>Due on</span><strong>{{ due_at }}</strong></div>
+      <div class="detail-row"><span>Returned on</span><strong>{{ returned_at }}</strong></div>
+      <div class="detail-row"><span>Condition</span><strong>{{ condition }}</strong></div>
+      <div class="detail-row"><span>Late days</span><strong>{{ late_days }}</strong></div>
+      <div class="detail-row"><span>Late fee</span><strong>£{{ '%.2f'|format(late_fee) }}</strong></div>
+      <div class="detail-row"><span>Original deposit</span><strong>£{{ '%.2f'|format(original_deposit) }}</strong></div>
+      <div class="detail-row"><span>Refund amount</span><strong class="status-available status-badge">£{{ '%.2f'|format(refund_amount) }}</strong></div>
+    </div>
+  </div>
+
+  <div class="page-actions section">
+    <a class="button button-primary" href="{{ url_for('dashboard.loans') }}">Back to active loans</a>
+    <a class="button button-secondary" href="{{ url_for('dashboard.equipment') }}">View equipment</a>
+  </div>
+{% endblock %}

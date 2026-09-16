@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div>
+      <p class="eyebrow">AV GEAR HUB / LENDING OPERATIONS</p>
+      <h1>Good morning, lending desk.</h1>
+      <p>Keep every camera, projector, microphone and tripod accounted for from one calm workspace.</p>
+    </div>
+    <div class="page-actions">
+      <a class="button button-secondary" href="{{ url_for('dashboard.equipment') }}">View equipment</a>
+      <a class="button button-primary" href="{{ url_for('borrow.borrow') }}">+ Borrow equipment</a>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="card summary-card" data-mark="∑">
+      <div class="label">Total equipment</div>
+      <div class="value">{{ summary.total_units }}</div>
+    </div>
+    <div class="card summary-card" data-mark="✓">
+      <div class="label">Available units</div>
+      <div class="value">{{ summary.available }}</div>
+    </div>
+    <div class="card summary-card" data-mark="↔">
+      <div class="label">Currently borrowed</div>
+      <div class="value">{{ summary.borrowed }}</div>
+    </div>
+    <div class="card summary-card alert" data-mark="!">
+      <div class="label">Overdue loans</div>
+      <div class="value">{{ summary.overdue }}</div>
+    </div>
+    <div class="card summary-card warning" data-mark="△">
+      <div class="label">Damaged units</div>
+      <div class="value">{{ summary.damaged }}</div>
+    </div>
+    <div class="card summary-card warning" data-mark="×">
+      <div class="label">Lost units</div>
+      <div class="value">{{ summary.lost }}</div>
+    </div>
+  </div>
+
+  <div class="section overview-strip">
+    <div class="section-header"><div><p class="eyebrow">EQUIPMENT OVERVIEW</p><h2>Physical inventory at a glance</h2></div><a href="{{ url_for('dashboard.equipment') }}">Open inventory →</a></div>
+    <div class="overview-links">
+      <a class="overview-tile" href="{{ url_for('dashboard.equipment') }}"><span class="overview-glyph">CAM</span><span><strong>Cameras</strong><small>Explore physical units</small></span><b>→</b></a>
+      <a class="overview-tile" href="{{ url_for('dashboard.equipment') }}"><span class="overview-glyph">PRO</span><span><strong>Projectors</strong><small>Explore physical units</small></span><b>→</b></a>
+      <a class="overview-tile" href="{{ url_for('dashboard.equipment') }}"><span class="overview-glyph">MIC</span><span><strong>Microphones</strong><small>Explore physical units</small></span><b>→</b></a>
+      <a class="overview-tile" href="{{ url_for('dashboard.equipment') }}"><span class="overview-glyph">TRI</span><span><strong>Tripods</strong><small>Explore physical units</small></span><b>→</b></a>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>Recent activity</h2><span class="muted">Latest lending desk activity</span></div>
+    {% if recent_activity %}
+      <div class="table-wrap"><table>
+        <thead>
+          <tr>
+            <th>Borrower</th>
+            <th>Equipment</th>
+            <th>Asset tag</th>
+            <th>Status</th>
+            <th>Borrowed date</th>
+            <th>Due date</th>
+            <th>Returned date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in recent_activity %}
+            <tr data-filter-row>
+              <td class="primary-text">{{ item.borrower }}</td>
+              <td>{{ item.equipment }}</td>
+              <td class="asset-tag">{{ item.asset_tag }}</td>
+              <td>
+                <span class="status-badge status-{{ item.status if item.status in ['available','borrowed','overdue','damaged','lost','maintenance'] else 'borrowed' }}">
+                  {{ item.status.title() }}
+                </span>
+              </td>
+              <td>{{ item.borrowed_at }}</td>
+              <td>{{ item.due_at }}</td>
+              <td>{{ item.returned_at or '—' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% else %}
+      <div class="empty"><strong>No recent activity</strong>Borrowing and return activity will appear here.</div>
+    {% endif %}
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>Return reminders</h2><span class="muted">Next 2 days</span></div>
+    {% if due_soon_loans %}
+      <div class="table-wrap"><table>
+        <thead>
+          <tr>
+            <th>Borrower</th>
+            <th>Equipment</th>
+            <th>Asset tag</th>
+            <th>Due date</th>
+            <th>Reminder</th>
+            <th>Days remaining</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in due_soon_loans %}
+            <tr data-filter-row>
+              <td class="primary-text">{{ loan.borrower }}</td>
+              <td>{{ loan.equipment }}</td>
+              <td class="asset-tag">{{ loan.asset_tag }}</td>
+              <td>{{ loan.due_at }}</td>
+              <td>
+                {% if loan.reminder_status == 'due_today' %}
+                  <span class="status-badge status-overdue">Due today</span>
+                {% else %}
+                  <span class="status-badge status-borrowed">Due soon</span>
+                {% endif %}
+              </td>
+              <td>{{ loan.days_remaining }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% else %}
+      <div class="empty"><strong>Nothing due soon</strong>No active loans are due within the next 2 days.</div>
+    {% endif %}
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>Overdue</h2><a href="{{ url_for('dashboard.overdue') }}">View all overdue loans →</a></div>
+    {% if overdue_loans %}
+      <div class="table-wrap"><table>
+        <thead>
+          <tr>
+            <th>Borrower</th>
+            <th>Equipment</th>
+            <th>Asset tag</th>
+            <th>Borrowed date</th>
+            <th>Due date</th>
+            <th>Days overdue</th>
+            <th>Estimated late fee</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for loan in overdue_loans %}
+            <tr>
+              <td class="primary-text">{{ loan.borrower }}</td>
+              <td>{{ loan.equipment }}</td>
+              <td class="asset-tag">{{ loan.asset_tag }}</td>
+              <td>{{ loan.borrowed_at }}</td>
+              <td>{{ loan.due_at }}</td>
+              <td>{{ loan.days_overdue }}</td>
+              <td>£{{ '%.2f'|format(loan.estimated_late_fee) }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table></div>
+    {% else %}
+      <div class="empty"><strong>All clear</strong>No active loans are overdue.</div>
+    {% endif %}
+  </div>
+{% endblock %}

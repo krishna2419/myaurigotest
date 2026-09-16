@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Return Equipment{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">CLOSE LOAN</p><h1>Return equipment</h1><p>Record the condition and settle the loan's late fee and deposit refund.</p></div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-list">
+        {% for category, message in messages %}
+          <div class="flash-message {% if category == 'error' %}flash-error{% else %}flash-success{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="card detail-grid">
+    <div class="detail-row"><span>Borrower</span><strong>{{ loan.borrower_name }}</strong></div>
+    <div class="detail-row"><span>Equipment</span><strong>{{ loan.equipment_name }}</strong></div>
+    <div class="detail-row"><span>Asset tag</span><strong class="asset-tag">{{ loan.asset_tag }}</strong></div>
+    <div class="detail-row"><span>Borrowed date</span><strong>{{ loan.borrowed_at }}</strong></div>
+    <div class="detail-row"><span>Due date</span><strong>{{ loan.due_at }}</strong></div>
+    <div class="detail-row"><span>Current status</span><strong>{{ loan.status|replace('_', ' ')|title }}</strong></div>
+    <div class="detail-row"><span>Deposit amount</span><strong>£{{ '%.2f'|format(loan.deposit_amount) }}</strong></div>
+    <div class="detail-row"><span>Daily late fee</span><strong>£{{ '%.2f'|format(loan.daily_late_fee) }}</strong></div>
+  </div>
+
+  <form method="post" class="section form-shell">
+    <div class="card choice-card">
+      <label for="condition">Return condition</label>
+      <div class="condition-choices">
+        <label class="condition-option condition-good"><input id="condition-good" type="radio" name="condition" value="Good" checked><span><strong>Good</strong><small>Return to available stock</small></span></label>
+        <label class="condition-option condition-damaged"><input id="condition-damaged" type="radio" name="condition" value="Damaged"><span><strong>Damaged</strong><small>Hold for inspection</small></span></label>
+        <label class="condition-option condition-lost"><input id="condition-lost" type="radio" name="condition" value="Lost"><span><strong>Lost</strong><small>Remove from availability</small></span></label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="button-primary" type="submit">Confirm return</button>
+      <a class="button button-secondary" href="{{ url_for('dashboard.loans') }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

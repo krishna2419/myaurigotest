@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Active Loans{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div><p class="eyebrow">LENDING DESK</p><h1>Active loans</h1><p>Every active unit, its due date, and the next action at a glance.</p></div>
+    <div class="page-actions"><a class="button button-primary" href="{{ url_for('borrow.borrow') }}">+ Borrow equipment</a></div>
+  </div>
+
+  {% if active_loans %}
+    <div class="table-toolbar"><div><strong>{{ active_loans|length }} active loan{% if active_loans|length != 1 %}s{% endif %}</strong><span class="muted">Keep ownership and due dates visible.</span></div><input class="table-filter" data-filter-input="#active-loans-table" placeholder="Search borrower, equipment or asset tag" aria-label="Search active loans"></div>
+    <div class="table-wrap"><table>
+      <thead>
+        <tr>
+          <th>Borrower</th>
+          <th>Equipment type</th>
+          <th>Asset tag</th>
+          <th>Borrowed date</th>
+          <th>Due date</th>
+          <th>Status</th>
+          <th>Days overdue</th>
+          <th>Deposit amount</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="active-loans-table">
+        {% for loan in active_loans %}
+          <tr data-filter-row>
+            <td class="primary-text">{{ loan.borrower }}</td>
+            <td>{{ loan.equipment }}</td>
+            <td class="asset-tag">{{ loan.asset_tag }}</td>
+            <td>{{ loan.borrowed_at }}</td>
+            <td>{{ loan.due_at }}</td>
+            <td>
+              {% if loan.loan_status == 'overdue' %}
+                <span class="status-badge status-overdue">Overdue — return required</span>
+              {% elif loan.loan_status == 'due_today' %}
+                <span class="status-badge status-overdue">Due today</span>
+              {% elif loan.loan_status == 'due_soon' %}
+                <span class="status-badge status-borrowed">Due soon</span>
+              {% else %}
+                <span class="status-badge status-borrowed">Active</span>
+              {% endif %}
+            </td>
+            <td>{% if loan.days_overdue and loan.days_overdue > 0 %}{{ loan.days_overdue }}{% else %}0{% endif %}</td>
+            <td>{{ '£%.2f'|format(loan.deposit_amount) if loan.deposit_amount is not none else '£0.00' }}</td>
+            <td>
+              <div class="row-actions">
+                <a class="button button-secondary" href="{{ url_for('return.return_item', loan_id=loan.id) }}">Return</a>
+                <a class="button button-quiet" href="{{ url_for('transfer.transfer_item', loan_id=loan.id) }}">Transfer</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table></div>
+  {% else %}
+    <div class="empty"><strong>No active loans</strong>Every physical unit is currently available, returned, or unavailable.</div>
+  {% endif %}
+{% endblock %}
